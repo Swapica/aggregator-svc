@@ -1,0 +1,38 @@
+type: object
+required:
+  - dest_chain
+  - src_chain
+  - match_id
+  - order_id
+  - receiver
+  - sender
+properties:
+  dest_chain:
+    type: string
+    description: The identifier of the chain in which the match was placed.
+    example: "goerli"
+  src_chain:
+    type: string
+    description: The identifier of the chain in which the order is placed with which the match occurred.
+    example: "sepolia"
+  match_id:
+    type: string
+    format: int
+    description: The identifier of the match that was selected by the user that created the match.
+    example: 1
+  order_id:
+    type: string
+    format: int
+    description: The identifier of the order that was created by the user.
+    example: 1
+  receiver:
+    type: string
+    description: The address of the receiver who will get tokens placed in order.
+    example: "0xf41ceE234219D6cc3d90A6996dC3276aD378cfCF"
+  sender:
+    type: string
+    description: The address of the sender
+    example: "0xf41ceE234219D6cc3d90A6996dC3276aD378cfCF"
+  raw_tx_data:
+    type: string
+    description: redeem tx data with collected signatures

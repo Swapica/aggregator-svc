@@ -1,0 +1,19 @@
+type: object
+required:
+  - src_chain
+  - order_id
+  - sender
+properties:
+  src_chain:
+    type: string
+    description: The identifier of the chain in which the order is placed with which the match occurred.
+    example: "sepolia"
+  order_id:
+    type: string
+    format: int
+    description: The identifier of the order that was selected by the user to cancel.
+    example: 1
+  sender:
+    type: string
+    description: The address of the sender
+    example: "0xf41ceE234219D6cc3d90A6996dC3276aD378cfCF"

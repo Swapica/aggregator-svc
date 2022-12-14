@@ -1,0 +1,28 @@
+type: object
+required:
+  - src_chain
+  - token_to_sell
+  - amount_to_sell
+  - token_to_buy
+  - amount_to_buy
+  - dest_chain
+  - sender
+properties:
+  src_chain:
+    type: string
+  token_to_sell:
+    type: string
+    description: address of token contract
+  amount_to_sell:
+    type: string
+    format: amount.Amount
+  token_to_buy:
+    type: string
+    description: address of token contract
+  amount_to_buy:
+    type: string
+    format: amount.Amount
+  dest_chain:
+    type: string
+  sender:
+    type: string

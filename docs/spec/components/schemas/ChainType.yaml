@@ -1,0 +1,4 @@
+type: string
+description: Type of blockchain by supported wallets, APIs, etc.
+enum:
+  - evm

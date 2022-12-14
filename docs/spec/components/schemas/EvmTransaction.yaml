@@ -1,0 +1,28 @@
+allOf:
+  - $ref: '#/components/schemas/EvmTransactionKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - tx_body
+        properties:
+          tx_body:
+            $ref: '#/components/schemas/EvmTransactionTxBody'
+          confirmed:
+            type: boolean
+            description: Is enough signatures to send tx
+      relationships:
+        type: object
+        required:
+          - chains
+        properties:
+          chain:
+            type: object
+            description: The chain in which the transaction is to be executed
+            properties:
+              data:
+                $ref: '#/components/schemas/ChainKey'

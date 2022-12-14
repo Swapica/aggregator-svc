@@ -1,0 +1,27 @@
+type: object
+required:
+  - sender
+  - chain_id
+  - token_address
+  - token_type
+properties:
+  sender:
+    type: string
+    description: The address of the sender
+    example: "0xf41ceE234219D6cc3d90A6996dC3276aD378cfCF"
+  chain_id:
+    type: string
+    description: The identifier of the chain in which the token exists.
+    example: "goerli"
+  token_address:
+    type: string
+    description: The token address on specified chain id.
+    example: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+  token_type:
+    type: string
+    description: The token address on specified chain id.
+    example: "erc20"
+    enum:
+      - "erc20"
+      - "erc721"
+      - "erc1155"
