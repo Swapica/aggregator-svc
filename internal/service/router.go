@@ -23,6 +23,7 @@ func (s *service) router() chi.Router {
 	r.Route("/v1", func(r chi.Router) {
 		r.Use(middleware.EndpointBuilder)
 		r.Route("/{action}", func(r chi.Router) {
+			r.Get("/", handlers.GetChainList)
 			r.Post("/", handlers.Action)
 			r.Post("/{target}", handlers.ActionTarget)
 		})

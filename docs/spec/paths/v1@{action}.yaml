@@ -6,6 +6,43 @@ parameters:
     schema:
       type: string
 
+get:
+  tags:
+    - Chains
+  summary: Get supported chains list
+  operationId: getChainList
+  parameters:
+    - in: query
+      name: 'filter[chain_type]'
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/ChainType'
+  responses:
+    200:
+      description: success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chain'
+    400:
+      description: bad input parameter
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    500:
+      description: internal error
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
 post:
   tags:
     - Action
