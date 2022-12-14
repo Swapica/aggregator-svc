@@ -1,0 +1,16 @@
+log:
+  level: debug
+  disable_sentry: true
+
+listener:
+  addr: :8000
+
+data:
+  nodes:
+    - "http://127.0.0.1:8001"
+    - "http://127.0.0.1:8002"
+    - "http://127.0.0.1:8003"
+    - "http://127.0.0.1:8004"
+
+cop:
+  disabled: true
