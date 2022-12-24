@@ -18,11 +18,17 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	endpoint := fmt.Sprintf("%v%v", nodes[0], r.RequestURI)
+	var res *http.Response
+	for i := 0; i < len(nodes); i++ {
+		endpoint := fmt.Sprintf("%v%v", nodes[i], r.RequestURI)
+		res, err = http.Get(endpoint)
+		if res != nil && res.StatusCode >= 200 && res.StatusCode < 300 {
+			break
+		}
+	}
 
-	res, err := http.Get(endpoint)
 	if err != nil {
-		helpers.Log(r).Error("failed to send request, endpoint: " + endpoint)
+		helpers.Log(r).Error("failed to send request to all nodes")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
