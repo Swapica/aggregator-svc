@@ -6,12 +6,11 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/Swapica/aggregator-svc/internal/service/requests"
-	"github.com/Swapica/swapica-svc/resources"
+	"github.com/Swapica/aggregator-svc/resources"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
-func AppendTxToBody(r *http.Request, tx *resources.EvmTransaction, actionTarget string) ([]byte, error) {
+func AppendTxToBody(r *http.Request, tx *resources.EvmTransaction) ([]byte, error) {
 	bodyCloned, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read request body")
@@ -22,25 +21,21 @@ func AppendTxToBody(r *http.Request, tx *resources.EvmTransaction, actionTarget 
 		return bodyCloned, nil
 	}
 
-	var body []byte
+	var fields map[string]map[string]interface{}
 
-	bodyReader := bytes.NewReader(bodyCloned)
-
-	switch actionTarget {
-	case "v1/create/match":
-		body, err = requests.ParseCreateMatchBody(bodyReader, tx)
-	case "v1/cancel/match":
-		body, err = requests.ParseCancelMatchBody(bodyReader, tx)
-	case "v1/execute/order":
-		body, err = requests.ParseExecuteOrderBody(bodyReader, tx)
-	case "v1/execute/match":
-		body, err = requests.ParseExecuteMatchBody(bodyReader, tx)
-	}
+	err = json.Unmarshal(bodyCloned, &fields)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed parse request body")
+		return nil, errors.Wrap(err, "failed to unmarshal request body")
 	}
 
-	return body, nil
+	fields["data"]["raw_tx_data"] = &tx.Attributes.TxBody.Data
+
+	rawBody, err := json.Marshal(fields)
+	if err != nil {
+		return nil, err
+	}
+
+	return rawBody, nil
 }
 
 func SendRequest(body io.Reader, endpoint string) (*resources.EvmTransaction, error) {
