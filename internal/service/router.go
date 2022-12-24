@@ -4,7 +4,6 @@ import (
 	"github.com/Swapica/aggregator-svc/internal/data/mem"
 	"github.com/Swapica/aggregator-svc/internal/service/handlers"
 	"github.com/Swapica/aggregator-svc/internal/service/helpers"
-	"github.com/Swapica/aggregator-svc/internal/service/middleware"
 	"github.com/go-chi/chi"
 	"gitlab.com/distributed_lab/ape"
 )
@@ -21,7 +20,6 @@ func (s *service) router() chi.Router {
 		),
 	)
 	r.Route("/v1", func(r chi.Router) {
-		r.Use(middleware.EndpointBuilder)
 		r.Get("/*", handlers.GetHandler)
 		r.Post("/*", handlers.PostHandler)
 	})

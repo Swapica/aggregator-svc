@@ -20,7 +20,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var tx *resources.EvmTransaction
-	actionTarget := r.Context().Value("actionTarget").(string)
 
 	for i := 0; i < len(nodes); i++ {
 		body, err := helpers.AppendTxToBody(r, tx)
@@ -30,7 +29,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tx, err = helpers.SendRequest(bytes.NewBuffer(body), fmt.Sprintf("%v/%v", nodes[i], actionTarget))
+		tx, err = helpers.SendRequest(bytes.NewBuffer(body), fmt.Sprintf("%v%v", nodes[i], r.RequestURI))
 		if err != nil {
 			helpers.Log(r).Error("failed to send request")
 			ape.RenderErr(w, problems.InternalError())

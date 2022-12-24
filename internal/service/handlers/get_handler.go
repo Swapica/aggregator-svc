@@ -18,8 +18,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	actionTarget := r.Context().Value("actionTarget").(string)
-	endpoint := fmt.Sprintf("%v/%v", nodes[0], actionTarget)
+	endpoint := fmt.Sprintf("%v%v", nodes[0], r.RequestURI)
 
 	res, err := http.Get(endpoint)
 	if err != nil {
