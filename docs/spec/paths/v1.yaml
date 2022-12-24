@@ -1,24 +1,8 @@
-parameters:
-  - name: action
-    in: path
-    description: The action to do. Could be approve.
-    required: true
-    schema:
-      type: string
-
 get:
   tags:
-    - Chains
-  summary: Get supported chains list
-  operationId: getChainList
-  parameters:
-    - in: query
-      name: 'filter[chain_type]'
-      required: false
-      schema:
-        type: array
-        items:
-          $ref: '#/components/schemas/ChainType'
+    - Proxy
+  summary: Get data from nodes
+  operationId: getData
   responses:
     200:
       description: success
@@ -29,10 +13,8 @@ get:
             properties:
               data:
                 type: array
-                items:
-                  $ref: '#/components/schemas/Chain'
     400:
-      description: bad input parameter
+      description: invalid request parameters
       content:
         application/vnd.api+json:
           schema:
@@ -43,12 +25,12 @@ get:
         application/vnd.api+json:
           schema:
             $ref: '#/components/schemas/Errors'
+
 post:
   tags:
-    - Action
-  summary: Some action
+    - Proxy
+  summary: Execute specified action onto evm.
   operationId: action
-  description: Execute specified action.
   responses:
     '200':
       description: Success
@@ -82,7 +64,3 @@ post:
           type: object
           required:
             - data
-          properties:
-            data:
-              oneOf:
-                - $ref: '#/components/schemas/ApproveRequest'

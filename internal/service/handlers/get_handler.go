@@ -10,7 +10,7 @@ import (
 	"gitlab.com/distributed_lab/ape/problems"
 )
 
-func GetChainList(w http.ResponseWriter, r *http.Request) {
+func GetHandler(w http.ResponseWriter, r *http.Request) {
 	nodes, err := helpers.Noder(r).Select()
 	if err != nil {
 		helpers.Log(r).Error("failed to get node list")
@@ -35,12 +35,13 @@ func GetChainList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	_, err = w.Write(body)
 	if err != nil {
 		helpers.Log(r).Error("failed to write to response")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
