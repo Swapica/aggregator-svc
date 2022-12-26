@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/Swapica/aggregator-svc/resources"
 	"net/http"
@@ -20,6 +21,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var tx *resources.EvmTransaction
+	var status int
 
 	for i := 0; i < len(nodes); i++ {
 		body, err := helpers.AppendTxToBody(r, tx)
@@ -29,10 +31,15 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tx, err = helpers.SendRequest(bytes.NewBuffer(body), fmt.Sprintf("%v%v", nodes[i], r.RequestURI))
+		tx, status, err = helpers.SendRequest(bytes.NewBuffer(body), fmt.Sprintf("%v%v", nodes[i], r.RequestURI))
+		if status == 400 {
+			helpers.Log(r).Error("validation failed")
+			ape.RenderErr(w, problems.BadRequest(errors.New("validation failed"))...)
+			return
+		}
 		if err != nil {
 			helpers.Log(r).Error("failed to send request")
-			ape.RenderErr(w, problems.InternalError())
+			ape.RenderErr(w, problems.BadRequest(err)...)
 			return
 		}
 		if tx == nil {

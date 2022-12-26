@@ -38,13 +38,17 @@ func AppendTxToBody(r *http.Request, tx *resources.EvmTransaction) ([]byte, erro
 	return newBody, nil
 }
 
-func SendRequest(body io.Reader, endpoint string) (*resources.EvmTransaction, error) {
+func SendRequest(body io.Reader, endpoint string) (*resources.EvmTransaction, int, error) {
 	res, err := http.Post(endpoint, "application/json", body)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to send request, endpoint: "+endpoint)
+		return nil, res.StatusCode, errors.Wrap(err, "failed to send request, endpoint: "+endpoint)
+	}
+	if res.StatusCode == 400 {
+		return nil, res.StatusCode, errors.New("invalid parameters")
 	}
 
-	return ParseEvmTransactionResponse(res)
+	tx, err := ParseEvmTransactionResponse(res)
+	return tx, res.StatusCode, err
 }
 
 type TxResponse struct {
