@@ -2,7 +2,8 @@ openapi: 3.0.0
 info:
   version: 1.0.0
   title: aggregator-svc
-  description: ''
+  description: 'This is just a proxy (service aggregator) for swapica services, 
+  if you need endpoints for these services, see the Swapica services documentation '
 servers:
-  - url: 'https://api.demo.tokend.io'
+  - url: 'https://api.swapica.io'
     description: TokenD Developer Environment

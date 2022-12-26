@@ -1,8 +1,10 @@
 get:
   tags:
     - Proxy
-  summary: Get data from nodes
+  summary: Get the data from nodes
   operationId: getData
+  description: 'This endpoint transmits all get requests from the outside world to the nodes,
+  no data processing is done on the proxy side. '
   responses:
     200:
       description: success
@@ -13,6 +15,10 @@ get:
             properties:
               data:
                 type: array
+                items:
+                  type: string
+                  description: Data mock for proxy, see node docs for more details.
+                  example: "---"
     400:
       description: invalid request parameters
       content:
@@ -29,8 +35,10 @@ get:
 post:
   tags:
     - Proxy
-  summary: Execute specified action onto evm.
-  operationId: action
+  summary: Perform the specified action on evm.
+  operationId: performAction
+  description: 'This endpoint passes all POST requests from the outside world to the nodes, in response 
+  it always returns an evm transaction with the necessary number of signatures to execute the transaction'
   responses:
     '200':
       description: Success
@@ -41,10 +49,6 @@ post:
             properties:
               data:
                 $ref: '#/components/schemas/EvmTransaction'
-              included:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Chain'
     '404':
       description: Could not find specified match/order
       content:
@@ -62,5 +66,6 @@ post:
       application/json:
         schema:
           type: object
+          description: See the Swapica services documentation for the request body for specific endpoints.
           required:
             - data
