@@ -11,31 +11,31 @@ import (
 )
 
 func AppendTxToBody(r *http.Request, tx *resources.EvmTransaction) ([]byte, error) {
-	bodyCloned, err := io.ReadAll(r.Body)
+	clonedBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read request body")
 	}
-	r.Body = io.NopCloser(bytes.NewReader(bodyCloned))
+	r.Body = io.NopCloser(bytes.NewReader(clonedBody))
 
 	if tx == nil {
-		return bodyCloned, nil
+		return clonedBody, nil
 	}
 
 	var fields map[string]map[string]interface{}
 
-	err = json.Unmarshal(bodyCloned, &fields)
+	err = json.Unmarshal(clonedBody, &fields)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal request body")
 	}
 
 	fields["data"]["raw_tx_data"] = &tx.Attributes.TxBody.Data
 
-	rawBody, err := json.Marshal(fields)
+	newBody, err := json.Marshal(fields)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to marshal new body")
 	}
 
-	return rawBody, nil
+	return newBody, nil
 }
 
 func SendRequest(body io.Reader, endpoint string) (*resources.EvmTransaction, error) {
