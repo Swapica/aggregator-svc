@@ -1,0 +1,12 @@
+type: object
+required:
+  - id
+  - type
+properties:
+  id:
+    type: string
+    description: transaction hash
+  type:
+    type: string
+    enum:
+      - evm_transaction

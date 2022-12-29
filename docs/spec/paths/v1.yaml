@@ -1,0 +1,71 @@
+get:
+  tags:
+    - Proxy
+  summary: Get the data from nodes
+  operationId: getData
+  description: 'This endpoint transmits all get requests from the outside world to the nodes,
+  no data processing is done on the proxy side. '
+  responses:
+    200:
+      description: success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: string
+                  description: Data mock for proxy, see node docs for more details.
+                  example: "---"
+    400:
+      description: invalid request parameters
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    500:
+      description: internal error
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+
+post:
+  tags:
+    - Proxy
+  summary: Perform the specified action on evm.
+  operationId: performAction
+  description: 'This endpoint passes all POST requests from the outside world to the nodes, in response 
+  it always returns an evm transaction with the necessary number of signatures to execute the transaction'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/EvmTransaction'
+    '404':
+      description: Could not find specified match/order
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    '500':
+      description: Failed to create transaction
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          description: See the Swapica services documentation for the request body for specific endpoints.
+          required:
+            - data
