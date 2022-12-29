@@ -15,7 +15,7 @@ import (
 func PostHandler(w http.ResponseWriter, r *http.Request) {
 	nodes, err := helpers.Noder(r).Select()
 	if err != nil {
-		helpers.Log(r).Error("failed to get node list")
+		helpers.Log(r).WithError(err).Error("failed to get node list")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -26,22 +26,23 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < len(nodes); i++ {
 		body, err := helpers.AppendTxToBody(r, tx)
 		if err != nil {
-			helpers.Log(r).Error("failed to append tx to body")
+			helpers.Log(r).WithError(err).Error("failed to append tx to body")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
 
 		tx, status, err = helpers.SendRequest(bytes.NewBuffer(body), fmt.Sprintf("%v%v", nodes[i], r.RequestURI))
+		if err != nil {
+			helpers.Log(r).WithError(err).Error("failed to send request")
+			ape.RenderErr(w, problems.BadRequest(err)...)
+			return
+		}
 		if status == 400 {
 			helpers.Log(r).Error("validation failed")
 			ape.RenderErr(w, problems.BadRequest(errors.New("validation failed"))...)
 			return
 		}
-		if err != nil {
-			helpers.Log(r).Error("failed to send request")
-			ape.RenderErr(w, problems.BadRequest(err)...)
-			return
-		}
+
 		if tx == nil {
 			helpers.Log(r).Error("failed to build transaction")
 			ape.RenderErr(w, problems.InternalError())

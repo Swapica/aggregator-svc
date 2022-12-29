@@ -41,7 +41,7 @@ func AppendTxToBody(r *http.Request, tx *resources.EvmTransaction) ([]byte, erro
 func SendRequest(body io.Reader, endpoint string) (*resources.EvmTransaction, int, error) {
 	res, err := http.Post(endpoint, "application/json", body)
 	if err != nil {
-		return nil, res.StatusCode, errors.Wrap(err, "failed to send request, endpoint: "+endpoint)
+		return nil, 0, errors.Wrap(err, "failed to send request, endpoint: "+endpoint)
 	}
 	if res.StatusCode == 400 {
 		return nil, res.StatusCode, errors.New("invalid parameters")
