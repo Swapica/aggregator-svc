@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"github.com/Swapica/aggregator-svc/resources"
+	"github.com/google/jsonapi"
 	"net/http"
 
 	"github.com/Swapica/aggregator-svc/internal/service/helpers"
@@ -21,7 +21,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var tx *resources.EvmTransaction
-	var status int
+	var apiErr *jsonapi.ErrorObject
 
 	for i := 0; i < len(nodes); i++ {
 		body, err := helpers.AppendTxToBody(r, tx)
@@ -31,31 +31,46 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tx, status, err = helpers.SendRequest(bytes.NewBuffer(body), fmt.Sprintf("%v%v", nodes[i], r.RequestURI))
+		newTx, status, err := helpers.SendRequest(bytes.NewBuffer(body), fmt.Sprintf("%v%v", nodes[i], r.RequestURI))
 		if err != nil {
 			helpers.Log(r).WithError(err).Error("failed to send request")
-			ape.RenderErr(w, problems.BadRequest(err)...)
-			return
+			continue
 		}
 		if status == 400 {
 			helpers.Log(r).Error("validation failed")
-			ape.RenderErr(w, problems.BadRequest(errors.New("validation failed"))...)
-			return
+			apiErr = &jsonapi.ErrorObject{
+				Title:  http.StatusText(http.StatusBadRequest),
+				Status: fmt.Sprintf("%d", http.StatusBadRequest),
+				Detail: "Validation failed",
+				Code:   "validation_failed",
+			}
+			continue
 		}
 
-		if tx == nil {
+		if newTx == nil {
 			helpers.Log(r).Error("failed to build transaction")
-			ape.RenderErr(w, problems.InternalError())
-			return
+			continue
 		}
+
+		tx = newTx
+
 		if *tx.Attributes.Confirmed {
 			break
 		}
 	}
 
 	if !*tx.Attributes.Confirmed {
+		if apiErr != nil {
+			ape.RenderErr(w, apiErr)
+			return
+		}
+
 		helpers.Log(r).Error("not enough nodes presented")
-		ape.RenderErr(w, problems.InternalError())
+		ape.RenderErr(w, &jsonapi.ErrorObject{
+			Title:  http.StatusText(http.StatusInternalServerError),
+			Status: fmt.Sprintf("%d", http.StatusInternalServerError),
+			Code:   "not_enough_active_validators",
+		})
 		return
 	}
 
